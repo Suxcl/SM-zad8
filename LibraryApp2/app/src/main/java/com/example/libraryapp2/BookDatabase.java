@@ -29,7 +29,13 @@ public abstract class BookDatabase extends RoomDatabase {
             super.onCreate(db);
             databaseWriteExecutor.execute(() -> {
                 BookDao dao = databaseInstance.bookDao();
-                Book book = new Book("Cleano Code", "Robert C.Martin");
+                dao.deleteAll();
+                Book book;
+                book = new Book("Cleano Code", "Robert C.Martin");
+                dao.insert(book);
+                book = new Book("Clean Code", "Robert C.Martin");
+                dao.insert(book);
+                book = new Book("Cleana Code", "Robert C.Martin");
                 dao.insert(book);
 
             });

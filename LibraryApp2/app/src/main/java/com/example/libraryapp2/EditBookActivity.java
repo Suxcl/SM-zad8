@@ -31,13 +31,11 @@ public class EditBookActivity extends AppCompatActivity {
             editAuthorEditText.setText(starter.getStringExtra(EXTRA_EDIT_BOOK_AUTHOR));
 
         final Button button = findViewById(R.id.button_save);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        button.setOnClickListener(view -> {
                 Intent replyIntent = new Intent();
-                if (TextUtils.isEmpty(editTitleEditText.getText())
-                        || TextUtils.isEmpty(editAuthorEditText.getText()))
+                if (TextUtils.isEmpty(editTitleEditText.getText()) || TextUtils.isEmpty(editAuthorEditText.getText())){
                     setResult(RESULT_CANCELED, replyIntent);
+                }
                 else {
                     String title = editTitleEditText.getText().toString();
                     replyIntent.putExtra(EXTRA_EDIT_BOOK_TITLE, title);
@@ -46,7 +44,7 @@ public class EditBookActivity extends AppCompatActivity {
                     setResult(RESULT_OK, replyIntent);
                 }
                 finish();
-            }
+
         });
     }
 }

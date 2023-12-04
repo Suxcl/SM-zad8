@@ -15,7 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.core.view.WindowCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -56,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
         bookViewModel = new ViewModelProvider(this).get(BookViewModel.class);
         bookViewModel.findAll().observe(this, adapter::setBooks);
 
-
+        bookViewModel = ViewModelProviders.of(this).get(BookViewModel.class);
+        bookViewModel.findAll().observe(this, new Observer<List<Book>>() {
+            @Override
+            public void onChanged(@Nullable final List<Book> books) {
+                adapter.setBooks(books);
+            }
+        });
 
         FloatingActionButton addBookButton = findViewById(R.id.add_button);
         addBookButton.setOnClickListener(new View.OnClickListener() {
@@ -93,16 +101,38 @@ public class MainActivity extends AppCompatActivity {
     private class BookHolder extends RecyclerView.ViewHolder{
         private TextView bookTitle;
         private TextView bookAuthor;
+        private Book book;
         public BookHolder(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.book_list_item, parent, false));
+
             bookTitle = itemView.findViewById(R.id.book_title);
             bookAuthor = itemView.findViewById(R.id.book_author);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainActivity.this.editedBook = book;
+                    Intent intent = new Intent(MainActivity.this, EditBookActivity.class);
+                    intent.putExtra(EditBookActivity.EXTRA_EDIT_BOOK_TITLE, book.getTitle());
+                    intent.putExtra(EditBookActivity.EXTRA_EDIT_BOOK_AUTHOR, book.getAuthor());
+                    startActivityForResult(intent, EDIT_BOOK_ACTIVITY_REQUEST_CODE);
+                }
+            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener(){
+                @Override
+                public boolean onLongClick(View v) {
+                    MainActivity.this.bookViewModel.delete(book);
+                    return true;
+                }
+            });
 
         }
         public void bind(Book book){
+            this.book = book;
             bookTitle.setText(book.getTitle());
             bookAuthor.setText(book.getAuthor());
         }
+
+
 
     }
     private class BookAdapter extends RecyclerView.Adapter<BookHolder>{
